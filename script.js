@@ -22,66 +22,57 @@ const textEditor = document.getElementById("textEditor");
 const editorSaveButton = document.getElementById("editorSaveButton");
 const editorCloseButton = document.getElementById("editorCloseButton");
 const editorModal = document.getElementById("editor-modal");
+const photoAlbumButton = document.getElementById('photoAlbumButton');
+const photoModal = document.getElementById('photo-modal');
+const photoCloseButton = document.getElementById('photoCloseButton');
+const photoInput = document.getElementById('photoInput');
+const photoGrid = document.getElementById('photoGrid');
 
+// Store photos in memory
+let photos = [];
 
-// initFileSystem
-(() => {
-  console.log("iife");
-  fileSystem.currentFolder = fileSystem.root;
-})();
+photoAlbumButton.addEventListener('click', () => {
+    photoModal.classList.remove('hidden');
+});
 
-// createFolder
-const createFolder = (name) => {
-  console.log("folder created");
-  modalHeading.innerText = "create a new Folder";
+photoCloseButton.addEventListener('click', () => {
+    photoModal.classList.add('hidden');
+});
 
-  if (isExistsCheck(name)) {
-    return {
-      status: false,
-      mesage: `${name} already exists`,
-    };
-  }
+photoInput.addEventListener('change', (e) => {
+    const files = e.target.files;
+    
+    for(let file of files) {
+        if(file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                const photoDiv = document.createElement('div');
+                photoDiv.className = 'photo-item';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                
+                photoDiv.appendChild(img);
+                photoGrid.appendChild(photoDiv);
+                
+                photos.push({
+                    name: file.name,
+                    data: e.target.result
+                });
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+});
 
-  fileSystem.currentFolder.children[name] = {
-    type: "folder",
-    name: name,
-    children: {},
-    parent: fileSystem.currentFolder,
-  };
-
-  return {
-    status: true,
-    mesage: `${name} folder created successfully`,
-    item: fileSystem.currentFolder.children[name],
-  };
-};
-
-// createFile
-const createFile = (name) => {
-  console.log("file created");
-
-  modalHeading.innerText = "create a new File";
-
-  if (isExistsCheck(name)) {
-    return {
-      status: false,
-      mesage: `${name} already exists`,
-    };
-  }
-
-  fileSystem.currentFolder.children[name] = {
-    type: "file",
-    name: name,
-    content: "",
-    parent: fileSystem.currentFolder,
-  };
-
-  return {
-    status: true,
-    mesage: `${name} file created successfully`,
-    item: fileSystem.currentFolder.children[name],
-  };
-};
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+    if(e.target === photoModal) {
+        photoModal.classList.add('hidden');
+    }
+});
 
 // isExistsCheck
 const isExistsCheck = (name) => {
