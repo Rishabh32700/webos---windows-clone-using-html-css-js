@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="displayArea" id="displayArea">
+            
+        </div>
+        <div class="dock">  
+            <div class="windowicon">
+                <img src="./assets/windowicon.jpg" alt="">
+            </div>
+            <div class="searchbar">
+                <input placeholder="Search here..." class="searchBarInput" type="text">
+            </div>
+            <div class="createFolder">
+                <p id="createFolderButton">📁</p>
+            </div>
+            <div class="createFile">
+                <p id="createFileButton">📄</p>
+            </div>
+
+            <!-- <button id="createFolderButton">createFolder</button>
+            <button id="createFileButton">Crate File</button> -->
+        </div>
+        <div class="editorModal hidden" id="editor-modal" >
+            <div class="modal-content editorModalContent">
+                <h1 id="textAreaHeading"></h1>
+                <textarea name="editor" id="textEditor" rows="20" placeholder="write some text here" ></textarea>
+                <button id="editorSaveButton">Save</button>
+                <button id="editorCloseButton">close</button>
+
+            </div>
+        </div>
+        <div class="modal hidden" id="modal">
+            <div class="modal-content">
+                <h1 id="modalHeading"></h1>
+                <input type="text" name="nameInput" id="nameInput" value="" >
+                <button id="closeModalButton">Close</button>
+                <button id="createModalButton">create</button>
+            </div>
+        </div>
+    </div>
+    <script src="./script.js"></script>
+</body>
+</html>

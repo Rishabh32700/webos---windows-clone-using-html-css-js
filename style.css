@@ -1,0 +1,147 @@
+
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: system-ui;
+    overflow: hidden;
+}
+
+.container{
+    width: 100vw;
+    height: 100vh;
+}
+
+.displayArea{
+    height: 95vh;
+    background-image: url(./assets/bg.jpg);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.dock{
+    border: 2px solid green;
+    height: 5vh;
+}
+
+
+.modal, .editorModal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    border: 2px solid green;
+    height: 95vh;
+    width: 100vw;
+    background-color: rgba(0,0,0,.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden{
+    display: none;
+}
+
+.modal-content{
+    background-color: white;
+    width: 50%;
+    height: 50%;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.card{
+    display: inline-block;
+    padding: 1rem;
+    width: 100px;
+    transition: all .1s ease-in-out;
+    color : white;
+    font-weight: 500;
+}
+
+.card:hover{
+    background-color: rgba(240, 248, 255, 0.151);
+    cursor: pointer;
+    transform: scale(1.1)
+}
+
+
+.card h1, .card p{
+    text-align: center;
+    width: 100%;
+}
+
+#textEditor{
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 1rem;
+      background-color: rgb(35, 35, 35);
+      color: white;
+}
+
+.editorModalContent{
+    height: 70%;
+    width: 70%;
+      background-color: rgb(35, 35, 35);
+}
+
+.windowicon{
+    height: 100%;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.windowicon img{
+    height: 60%;
+}
+
+.createFolder,
+.createFile{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin: 0 .5rem;
+}
+
+#createFolderButton, #createFileButton{
+    height: 100%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.dock{
+    display: flex;
+    background-color: rgb(35, 35, 35);
+}
+
+.searchbar{
+    width: 300px;
+    height: 100%;
+}
+.searchbar input{
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    background-color: rgb(63, 63, 63);
+    color: white;
+    outline: none;
+    border: none;
+}
+
+button {
+    padding: .5rem 1rem;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(0, 153, 255);
+    color: white;
+    font-weight: 500;
+}
