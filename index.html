@@ -24,9 +24,16 @@
             <div class="createFile">
                 <p id="createFileButton">📄</p>
             </div>
-
-            <!-- <button id="createFolderButton">createFolder</button>
-            <button id="createFileButton">Crate File</button> -->
+            <div class="photoAlbum">
+                <p id="photoAlbumButton">📸</p>
+            </div>
+            <div class="clock">
+                <p id="systemClock">12:00 PM</p>
+            </div>
+            <div class="battery">
+                <div class="battery-icon">🔋</div>
+                <span>100%</span>
+            </div>
         </div>
         <div class="editorModal hidden" id="editor-modal" >
             <div class="modal-content editorModalContent">
@@ -43,6 +50,17 @@
                 <input type="text" name="nameInput" id="nameInput" value="" >
                 <button id="closeModalButton">Close</button>
                 <button id="createModalButton">create</button>
+            </div>
+        </div>
+        <div class="photoModal hidden" id="photo-modal">
+            <div class="modal-content photoModalContent">
+                <h1>Photo Album</h1>
+                <div class="photo-upload">
+                    <input type="file" id="photoInput" accept="image/*" multiple>
+                    <label for="photoInput" class="upload-btn">Choose Photos</label>
+                </div>
+                <div class="photo-grid" id="photoGrid"></div>
+                <button id="photoCloseButton">Close</button>
             </div>
         </div>
     </div>
