@@ -164,6 +164,7 @@ button {
 
 .photoModalContent {
     text-align: center;
+    margin:0 auto;
 }
 
 .photo-upload {
@@ -211,6 +212,70 @@ button {
 
 .hidden {
     display: none;
+}
+
+.camera-container {
+    width: 100%;
+    margin: 20px auto;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+#camera-preview {
+    width: 100%;
+    max-height: 400px;
+    background-color: #000;
+    display: block;
+    border-radius: 8px;
+}
+
+.camera-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.camera-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+    gap: 10px;
+}
+
+#take-photo-btn {
+    background-color: #d4000e;
+}
+
+#switch-camera-btn {
+    background-color: #00a3d4;
+}
+
+#start-recording-btn {
+    background-color: #d40000;
+}
+
+#stop-recording-btn {
+    background-color: #333;
+}
+
+.recording-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: red;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
 }
 
 .clock {

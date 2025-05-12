@@ -30,6 +30,18 @@ const photoGrid = document.getElementById('photoGrid');
 
 //photos album
 let photos = [];
+let mediaStream = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let facingMode = "user"; // Default to front camera
+let videoElem;
+let cameraContainer;
+let openCameraBtn;
+let closeCameraBtn;
+let switchCameraBtn;
+let takePhotoBtn;
+let startRecordingBtn;
+let stopRecordingBtn;
 
 photoAlbumButton.addEventListener('click', () => {
     photoModal.classList.remove('hidden');
@@ -37,8 +49,207 @@ photoAlbumButton.addEventListener('click', () => {
 
 photoCloseButton.addEventListener('click', () => {
     photoModal.classList.add('hidden');
+    stopCamera();
 });
 
+// Initialize camera elements after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    videoElem = document.getElementById('camera-preview');
+    cameraContainer = document.getElementById('camera-container');
+    openCameraBtn = document.getElementById('open-camera-btn');
+    closeCameraBtn = document.getElementById('close-camera-btn');
+    switchCameraBtn = document.getElementById('switch-camera-btn');
+    takePhotoBtn = document.getElementById('take-photo-btn');
+    startRecordingBtn = document.getElementById('start-recording-btn');
+    stopRecordingBtn = document.getElementById('stop-recording-btn');
+    
+    openCameraBtn.addEventListener('click', startCamera);
+    closeCameraBtn.addEventListener('click', stopCamera);
+    switchCameraBtn.addEventListener('click', switchCamera);
+    takePhotoBtn.addEventListener('click', takePhoto);
+    startRecordingBtn.addEventListener('click', startRecording);
+    stopRecordingBtn.addEventListener('click', stopRecording);
+});
+
+// Function to start the camera
+async function startCamera() {
+    try {
+        const constraints = {
+            video: {
+                facingMode: facingMode
+            },
+            audio: false
+        };
+        
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoElem.srcObject = mediaStream;
+        
+        cameraContainer.classList.remove('hidden');
+        openCameraBtn.classList.add('hidden');
+        closeCameraBtn.classList.remove('hidden');
+        
+    } catch (error) {
+        console.error("Error accessing camera:", error);
+        alert("Could not access the camera. Please make sure you have granted camera permissions.");
+    }
+}
+
+// Function to stop the camera
+function stopCamera() {
+    if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+        videoElem.srcObject = null;
+    }
+    
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+    }
+    
+    cameraContainer.classList.add('hidden');
+    openCameraBtn.classList.remove('hidden');
+    closeCameraBtn.classList.add('hidden');
+    stopRecordingBtn.classList.add('hidden');
+    startRecordingBtn.classList.remove('hidden');
+    
+    // Remove recording indicator if it exists
+    const indicator = document.querySelector('.recording-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Function to switch between front and back cameras
+function switchCamera() {
+    facingMode = facingMode === "user" ? "environment" : "user";
+    stopCamera();
+    startCamera();
+}
+
+// Function to take a photo
+function takePhoto() {
+    if (!mediaStream) return;
+    
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    // Set canvas dimensions to match video
+    canvas.width = videoElem.videoWidth;
+    canvas.height = videoElem.videoHeight;
+    
+    // Draw the current video frame onto the canvas
+    context.drawImage(videoElem, 0, 0, canvas.width, canvas.height);
+    
+    // Convert to data URL
+    const imageDataUrl = canvas.toDataURL('image/png');
+    
+    // Create photo element and add to grid
+    addPhotoToGrid(imageDataUrl, 'camera-photo.png');
+}
+
+// Function to start video recording
+function startRecording() {
+    if (!mediaStream) return;
+    
+    recordedChunks = [];
+    
+    // Create a recorder with the stream
+    const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+    try {
+        mediaRecorder = new MediaRecorder(mediaStream, options);
+    } catch (e) {
+        console.error('MediaRecorder is not supported by this browser.');
+        return;
+    }
+    
+    // Event handlers
+    mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+        }
+    };
+    
+    mediaRecorder.onstop = () => {
+        // Create a blob from recorded chunks
+        const blob = new Blob(recordedChunks, {
+            type: 'video/webm'
+        });
+        
+        // Create URL for the blob
+        const videoUrl = URL.createObjectURL(blob);
+        
+        // Create a video element and add to grid
+        const videoDiv = document.createElement('div');
+        videoDiv.className = 'photo-item';
+        
+        const videoElement = document.createElement('video');
+        videoElement.src = videoUrl;
+        videoElement.controls = true;
+        
+        videoDiv.appendChild(videoElement);
+        photoGrid.appendChild(videoDiv);
+        
+        // Save video data
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            photos.push({
+                name: `recording-${new Date().toISOString()}.webm`,
+                data: e.target.result,
+                type: 'video'
+            });
+        };
+        reader.readAsDataURL(blob);
+    };
+    
+    // Start recording
+    mediaRecorder.start(100);
+    
+    // Add recording indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'recording-indicator';
+    cameraContainer.appendChild(indicator);
+    
+    // Update UI
+    startRecordingBtn.classList.add('hidden');
+    stopRecordingBtn.classList.remove('hidden');
+}
+
+// Function to stop video recording
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        
+        // Remove recording indicator
+        const indicator = document.querySelector('.recording-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        
+        // Update UI
+        startRecordingBtn.classList.remove('hidden');
+        stopRecordingBtn.classList.add('hidden');
+    }
+}
+
+// Helper function to add a photo to the grid
+function addPhotoToGrid(src, name) {
+    const photoDiv = document.createElement('div');
+    photoDiv.className = 'photo-item';
+    
+    const img = document.createElement('img');
+    img.src = src;
+    
+    photoDiv.appendChild(img);
+    photoGrid.appendChild(photoDiv);
+    
+    photos.push({
+        name: name,
+        data: src,
+        type: 'image'
+    });
+}
+
+// Handle file uploads from photo input
 photoInput.addEventListener('change', (e) => {
     const files = e.target.files;
     
@@ -47,19 +258,7 @@ photoInput.addEventListener('change', (e) => {
             const reader = new FileReader();
             
             reader.onload = (e) => {
-                const photoDiv = document.createElement('div');
-                photoDiv.className = 'photo-item';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                
-                photoDiv.appendChild(img);
-                photoGrid.appendChild(photoDiv);
-                
-                photos.push({
-                    name: file.name,
-                    data: e.target.result
-                });
+                addPhotoToGrid(e.target.result, file.name);
             };
             
             reader.readAsDataURL(file);
@@ -71,6 +270,7 @@ photoInput.addEventListener('change', (e) => {
 window.addEventListener('click', (e) => {
     if(e.target === photoModal) {
         photoModal.classList.add('hidden');
+        stopCamera();
     }
 });
 
