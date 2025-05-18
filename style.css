@@ -1,5 +1,4 @@
 
-
 *{
     padding: 0;
     margin: 0;
@@ -7,22 +6,26 @@
     font-family: system-ui;
     overflow: hidden;
 }
-
 .container{
     width: 100vw;
     height: 100vh;
+ 
 }
-
 .displayArea{
     height: 95vh;
     background-image: url(./assets/bg.jpg);
     background-repeat: no-repeat;
     background-size: 100% 100%;
+
+    /* display: felx;
+    flex-wrap: wrap;
+    gap: 16px; */
 }
 
-.dock{
-    border: 2px solid green;
+.doc{
+    /* border: 2px solid green; */
     height: 5vh;
+
 }
 
 
@@ -30,35 +33,41 @@
     position: fixed;
     top: 0;
     left: 0;
-    border: 2px solid green;
+    /* border: 2px solid green; */
     height: 95vh;
-    width: 100vw;
-    background-color: rgba(0,0,0,.5);
+    width: 100vw;background-color: rgba(0,0,0,.5);
     backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
     align-items: center;
+    
+    
 }
 
 .hidden{
     display: none;
-}
 
+}
 .modal-content{
     background-color: white;
     width: 50%;
     height: 50%;
     border-radius: 10px;
+    
     padding: 1rem;
+
 }
 
 .card{
+    
     display: inline-block;
     padding: 1rem;
-    width: 100px;
+    width: 150px;
+    margin: .1rem;
     transition: all .1s ease-in-out;
-    color : white;
+    color: white;
     font-weight: 500;
+
 }
 
 .card:hover{
@@ -67,47 +76,54 @@
     transform: scale(1.1)
 }
 
-
 .card h1, .card p{
     text-align: center;
     width: 100%;
+}
+
+.card p {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 }
 
 #textEditor{
     width: 100%;
     border: none;
     outline: none;
-    padding: 1rem;
-      background-color: rgb(35, 35, 35);
-      color: white;
+    /* padding: 1rem; */
+    resize: none;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap; 
 }
 
 .editorModalContent{
-    height: 70%;
-    width: 70%;
-      background-color: rgb(35, 35, 35);
+    height: 90%;
+    width: 90%;
 }
 
 .windowicon{
     height: 100%;
-    width: 45px;
-    display: flex;
+    /* width: 70px; */
+    display: felx;
     justify-content: center;
     align-items: center;
+
 }
 
 .windowicon img{
-    height: 60%;
+    height: 100%;
 }
 
-.createFolder,
-.createFile{
+
+.createFolder, .createFile{
     display: flex;
     justify-content: center;
     text-align: center;
     margin: 0 .5rem;
+    
 }
-
 #createFolderButton, #createFileButton{
     height: 100%;
     font-size: 20px;
@@ -115,28 +131,53 @@
     display: flex;
     justify-content: center;
     text-align: center;
+
 }
 
-.dock{
+.doc{
     display: flex;
-    background-color: rgb(35, 35, 35);
+    background-color: rgba(35, 35, 35);
 }
 
 .searchbar{
     width: 300px;
     height: 100%;
+    margin: 0 .5rem;
+    border: 2px solid gray;
+    position: relative;
+    display: flex;
 }
-.searchbar input{
+
+.searchbar Input{
     width: 100%;
     height: 100%;
     padding: 1rem;
-    background-color: rgb(63, 63, 63);
+    font-weight: bold;
+    background-color: rgba(63, 63, 63);
     color: white;
     outline: none;
     border: none;
+    padding-left: 50px;
+    
+   
+
 }
 
-button {
+.searchIcon{
+    width:20px;
+    height:20px;
+    
+    margin: 5px
+}
+
+.searchbar img{
+    width: 25px;
+    height: 20px;
+   
+    
+}
+
+button{
     padding: .5rem 1rem;
     outline: none;
     border: none;
@@ -144,96 +185,48 @@ button {
     background-color: rgb(0, 153, 255);
     color: white;
     font-weight: 500;
+
+}
+
+.searchBarInput{
+   padding-left: 45px; /* space for the icon */
+   background-repeat: no-repeat;
+   background-position: 10px center;
+   background-image: url(./assets/search-icon.png);
+   background-size: 20px 20px;
+   height: 40px;
+   border: 1px solid #ccc;
+   border-radius: 8px;
+   outline: none;
+      
 }
 
 
-.photoModal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+
+/* --------------------Extra part (pop menu or context menu ) */
+
+.context-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
     z-index: 1000;
-    width: 80%;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.photoModalContent {
-    text-align: center;
-}
-
-.photo-upload {
-    margin: 20px 0;
-}
-
-.upload-btn {
-    background: #0078d4;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
+    list-style: none;
+    padding: 5px 0;
+    width: 170px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    border-radius: 4px;
+  }
+  
+  .context-menu li {
+    padding: 8px 16px;
     cursor: pointer;
-    display: inline-block;
-}
-
-#photoInput {
+  }
+  
+  .context-menu li:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .hidden {
     display: none;
-}
-
-.photo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-.photo-item {
-    position: relative;
-    aspect-ratio: 1;
-    overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-}
-
-.photo-item:hover {
-    transform: scale(1.05);
-}
-
-.photo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.hidden {
-    display: none;
-}
-
-.clock {
-    margin-left: auto;
-    padding: 0 20px;
-    color: white;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-}
-
-#systemClock {
-    margin: 0;
-}
-
-.battery {
-    display: flex;
-    align-items: center;
-    color: white;
-    padding: 0 15px;
-    gap: 5px;
-}
-
-.battery-icon {
-    font-size: 16px;
-}
+  }
+  

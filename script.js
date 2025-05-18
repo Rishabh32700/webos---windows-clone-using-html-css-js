@@ -11,271 +11,203 @@ const fileSystem = {
 };
 
 const nameInput = document.getElementById("nameInput");
+
 const createFolderButton = document.getElementById("createFolderButton");
 const createFileButton = document.getElementById("createFileButton");
+
 const createModalButton = document.getElementById("createModalButton");
+
 const modal = document.getElementById("modal");
+
 const modalHeading = document.getElementById("modalHeading");
 const closeModalButton = document.getElementById("closeModalButton");
 const displayArea = document.getElementById("displayArea");
+
+const editorModal = document.getElementById("editorModal");
 const textEditor = document.getElementById("textEditor");
 const editorSaveButton = document.getElementById("editorSaveButton");
 const editorCloseButton = document.getElementById("editorCloseButton");
-const editorModal = document.getElementById("editor-modal");
-const photoAlbumButton = document.getElementById('photoAlbumButton');
-const photoModal = document.getElementById('photo-modal');
-const photoCloseButton = document.getElementById('photoCloseButton');
-const photoInput = document.getElementById('photoInput');
-const photoGrid = document.getElementById('photoGrid');
 
-//photos album
-let photos = [];
+// ------------------EXTRA PART (pop menu or context menu )-----------------------
+const contextMenu = document.getElementById("contextMenu");
+const contextCreateFile = document.getElementById("contextCreateFile");
+const contextCreateFolder = document.getElementById("contextCreateFolder");
 
-photoAlbumButton.addEventListener('click', () => {
-    photoModal.classList.remove('hidden');
-});
 
-photoCloseButton.addEventListener('click', () => {
-    photoModal.classList.add('hidden');
-});
+// ------------------ Extra part end ------------
 
-photoInput.addEventListener('change', (e) => {
-    const files = e.target.files;
-    
-    for(let file of files) {
-        if(file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                const photoDiv = document.createElement('div');
-                photoDiv.className = 'photo-item';
-                
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                
-                photoDiv.appendChild(img);
-                photoGrid.appendChild(photoDiv);
-                
-                photos.push({
-                    name: file.name,
-                    data: e.target.result
-                });
-            };
-            
-            reader.readAsDataURL(file);
-        }
-    }
-});
-
-// Close the photo modal when clicking outside the modal content
-window.addEventListener('click', (e) => {
-    if(e.target === photoModal) {
-        photoModal.classList.add('hidden');
-    }
-});
-
-// Close the photo modal when clicking the close button
-const isExistsCheck = (name) => {
-  console.log(fileSystem);
-
-  return fileSystem.currentFolder.children.hasOwnProperty(name);
-};
+// Initialize current folder to root on page load
+(() => {
+  fileSystem.currentFolder = fileSystem.root;
+})();
 
 const ele = {
   modalType: null,
 };
 
-// createFolder
+// Check if name exists in current folder children
+const isExistsCheck = (name) => {
+  return fileSystem.currentFolder.children.hasOwnProperty(name);
+};
+
+// Create folder function
 const createFolder = (name) => {
+  modalHeading.innerText = "Create a new folder";
+
   if (isExistsCheck(name)) {
-    return {
-      status: false,
-      message: "Folder already exists",
-    };
+    return { status: false, message: `${name} already exists` };
   }
+
   fileSystem.currentFolder.children[name] = {
     type: "folder",
-    name: name,
+    name,
     children: {},
     parent: fileSystem.currentFolder,
   };
-  return {
-    status: true,
-    message: "Folder created successfully",
+
+  return { status: true, message: `${name} folder created successfully`, item: fileSystem.currentFolder.children[name] };
+};
+
+// Create file function
+const createFile = (name) => {
+  modalHeading.innerText = "Create a new file";
+
+  if (isExistsCheck(name)) {
+    return { status: false, message: `${name} already exists` };
+  }
+
+  fileSystem.currentFolder.children[name] = {
+    type: "file",
+    name,
+    content: "",
+    parent: fileSystem.currentFolder,
   };
+
+  return { status: true, message: `${name} file created successfully`, item: fileSystem.currentFolder.children[name] };
+};
+
+// Open modal function: just shows modal and sets type
+const openModal = (modalType) => {
+  modal.classList.remove("hidden"); // show modal
+  ele.modalType = modalType;
+  modalHeading.innerText = modalType === "Folder" ? "Create a new Folder" : "Create a new File";
+  nameInput.value = "";  // clear input when opening modal
+  nameInput.focus();
+};
+
+// Close modal function
+const closeModal = () => {
+  modal.classList.add("hidden"); // hide modal
+  nameInput.value = "";
+};
+
+// Display created folder/file on screen
+const displayItemsOnscreen = (name) => {
+  const div = document.createElement("div");
+
+  const icon = ele.modalType === "Folder" ? "📂" : "📄";
+  const subName = name;
+
+  div.innerHTML = `
+    <div class="card">
+      <h1>${icon}</h1>
+      <p>${subName}</p>
+    </div>
+  `;
+
+  div.id = name;
+
+  displayArea.appendChild(div);
+
+  div.addEventListener("dblclick", () => {
+    const item = fileSystem.currentFolder.children[subName];
+    if (!item) return;  // just in case
   
+    if (item.type === "folder") {
+      navigate(subName);
+    } else if (item.type === "file") {
+      openEditor(subName);
+    }
+  });
   
-}
-// Move event listeners outside of openModal function
+};
+
+// Navigate function (folder open)
+const navigate = (name) => {
+  console.log("Navigate to folder:", name);
+  // You can add your folder navigation logic here
+};
+
+// Open editor modal for files
+const openEditor = (name) => {
+  editorModal.classList.remove("hidden");
+
+  fileSystem.currentFile = fileSystem.currentFolder.children[name];
+
+  textEditor.value = fileSystem.currentFile.content;
+};
+
+// Event listeners for editor modal buttons
+editorSaveButton.addEventListener("click", () => {
+  if (fileSystem.currentFile) {
+    fileSystem.currentFile.content = textEditor.value;
+    editorModal.classList.add("hidden");
+  }
+});
+
+editorCloseButton.addEventListener("click", () => {
+  editorModal.classList.add("hidden");
+});
+
+// Event listeners for modal open buttons
+createFolderButton.addEventListener("click", () => {
+  openModal("Folder");
+});
+
+createFileButton.addEventListener("click", () => {
+  openModal("File");
+});
+
+// **IMPORTANT: Add event listeners for modal buttons ONCE here, NOT inside openModal**
 closeModalButton.addEventListener("click", () => {
   closeModal();
 });
 
 createModalButton.addEventListener("click", () => {
   const name = nameInput.value.trim();
-  if (name) {
-    const returnVal =
-      ele.modalType === "folder" ? createFolder(name) : createFile(name);
-    console.log(returnVal);
-    if (returnVal.status) {
-      displayItemsOnscreen(name);
-    }
-    closeModal();
+  if (!name) return;
+
+  const returnVal = ele.modalType === "Folder" ? createFolder(name) : createFile(name);
+
+  if (returnVal.status) {
+    displayItemsOnscreen(name);
+  } else {
+    alert(returnVal.message);
   }
+
+  closeModal();
 });
 
-const openModal = (modalType) => {
-  console.log(modalType);
-  modal.classList.toggle("hidden");
-  modalType === "folder"
-    ? (ele.modalType = "folder")
-    : (ele.modalType = "file");
-  modalHeading.innerText =
-    ele.modalType === "folder" ? "Create a new folder" : "Create a new file";
-  nameInput.focus();
-};
+// -----------------EXTRA PART (pop menu or context menu).--------------------
 
-// closeModal
-const closeModal = (modalType) => {
-  console.log(modalType);
-  modal.classList.toggle("hidden");
-  nameInput.value = "";
-};
-
-createFolderButton.addEventListener("click", () => {
-  openModal("folder");
+// Show context menu on right-click
+displayArea.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+  contextMenu.style.top = `${e.pageY}px`;
+  contextMenu.style.left = `${e.pageX}px`;
+  contextMenu.classList.remove("hidden");
 });
 
-createFileButton.addEventListener("click", () => {
-  openModal("file");
+// Hide context menu when clicking elsewhere
+document.addEventListener("click", () => {
+  contextMenu.classList.add("hidden");
 });
 
-// displayItemsOnscreen
-
-const displayItemsOnscreen = (name) => {
-  const div = document.createElement("div");
-  console.log(ele, "ele");
-
-  const icon = ele.modalType === "folder" ? "📁" : "📄";
-  const subName = name;
-  div.innerHTML = `
-    <div class="card">
-        <h1>${icon}</h1>
-        <p>${subName}</p>
-    </div>
-    `;
-
-  div.id = name;
-  displayArea.appendChild(div);
-  div.addEventListener("dblclick",()=>{
-    console.log("dblclick");
-    ele.modalType === "folder" ? navigate(subName) : openEditor(subName)
-    
-  })
-
-};
-
-
-// openFolder
-const navigate = (name) => {
-    console.log(name, "name from navigator");
-    // Clear current display area
-    displayArea.innerHTML = '';
-    
-    // Update current folder
-    fileSystem.currentFolder = fileSystem.currentFolder.children[name];
-    
-    // Add back button if not in root
-    if (fileSystem.currentFolder.parent !== null) {
-        const backDiv = document.createElement("div");
-        backDiv.innerHTML = `
-            <div class="card">
-                <h1>⬅️</h1>
-                <p>Back</p>
-            </div>
-        `;
-        backDiv.addEventListener("click", () => {
-            displayArea.innerHTML = '';
-            fileSystem.currentFolder = fileSystem.currentFolder.parent;
-            // Display parent folder contents
-            Object.keys(fileSystem.currentFolder.children).forEach(childName => {
-                displayItemsOnscreen(childName);
-            });
-        });
-        displayArea.appendChild(backDiv);
-    }
-    
-    // Display folder contents
-    Object.keys(fileSystem.currentFolder.children).forEach(childName => {
-        displayItemsOnscreen(childName);
-    });
-}
-const openEditor = (name) => {
-    editorModal.classList.remove("hidden");
-    fileSystem.currentFile = fileSystem.currentFolder.children[name];
-    textEditor.value = fileSystem.currentFile.content;
-    document.getElementById("textAreaHeading").textContent = `Editing: ${name}`;
-}
-
-editorSaveButton.addEventListener("click", () => {
-    if (fileSystem.currentFile) {
-        fileSystem.currentFile.content = textEditor.value;
-        editorModal.classList.add("hidden");
-        // Optional: Show save confirmation
-        alert("File saved successfully!");
-    }
+// Create file/folder from context menu
+contextCreateFile.addEventListener("click", () => {
+  openModal("File");
 });
 
-
-editorCloseButton.addEventListener("click", ()=>{
-  console.log("close editor clicked");
-  
-  editorModal.classList.add("hidden")
-})
-
-// delete File
-
-// delete folder
-
-// update file
-
-// save
-
-// System Clock
-function updateClock() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString();
-    document.getElementById('systemClock').textContent = timeString;
-}
-
-setInterval(updateClock, 1000);
-updateClock();
-
-// Add initialization for fileSystem
-fileSystem.currentFolder = fileSystem.root;
-fileSystem.currentPath = "/";
-
-// Add createFile function that was missing
-const createFile = (name) => {
-  if (isExistsCheck(name)) {
-    return {
-      status: false,
-      message: "File already exists",
-    };
-  }
-  fileSystem.currentFolder.children[name] = {
-    type: "file",
-    name: name,
-    content: "",
-    parent: fileSystem.currentFolder,
-  };
-  return {
-    status: true,
-    message: "File created successfully",
-  };
-};
-
-// Add editor close functionality
-editorCloseButton.addEventListener("click", () => {
-  editorModal.classList.add("hidden");
+contextCreateFolder.addEventListener("click", () => {
+  openModal("Folder");
 });
